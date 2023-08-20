@@ -21,35 +21,35 @@ class HomeViewModel(private val etaRepository: EtaRepository): ViewModel() {
     var homeUiState: HomeUiState by mutableStateOf(HomeUiState.Loading)
         private set
 
+    var searchText: String by mutableStateOf("")
+        private set
+
     var allStopInformation: StopInformationList =
         StopInformationList("", "", "", emptyList())
     init {
         Log.d(TAG,"initialize")
         getRouteListDataForTheHomeScreen()
-        getAllStationInformation()
     }
 
     lateinit var route: String
     lateinit var bound: String
 
+    fun onSearchTextChanged(searchText: String){
+        this.searchText = searchText
+    }
+
     fun getRouteListDataForTheHomeScreen(){
         Log.d(TAG,"getRouteListData")
         viewModelScope.launch {
             try {
+                etaRepository.getMyStop()
                 homeUiState = HomeUiState.Success(etaRepository.getRouteListData())
             }catch (e: java.io.IOException){
                 homeUiState = HomeUiState.Error
             }
-        }
-    }
-    fun getAllStationInformation() {
-        Log.d(TAG,"getAllStationInformation")
-        viewModelScope.launch {
-            try {
-                allStopInformation = etaRepository.getAllStationInfo()
-                Log.d("getAllStationInfo", allStopInformation.toString())
-            } catch (e: Exception) {
+            catch (e: retrofit2.HttpException){
                 homeUiState = HomeUiState.Error
+                Log.e("HomeViewModel",e.message())
             }
         }
     }

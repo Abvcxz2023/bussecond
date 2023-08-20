@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -24,40 +24,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bussecond.R
-import com.example.bussecond.model.Eta
 import com.example.bussecond.ui.AppViewModelProvider
 import com.example.bussecond.ui.navigation.NavigationDestination
+import java.text.SimpleDateFormat
+import java.util.Date
 
-object DetailScreenDesination: NavigationDestination{
+object DetailScreenDestination: NavigationDestination{
     override val route = "item_details"
-    override val titleRes = 1
-    const val boundArg = "itemId"
+    const val boundArg = "boundId"
     const val routeIdArg = "routeId"
-    val routeWithArgs = "$route/{$boundArg}{$routeIdArg}"
+    const val destination = "destination"
+    val routeWithArgs = "$route/{$boundArg}/{$routeIdArg}/{$destination}"
 }
 
 @Composable
-fun DetailScreen(retryAction: () -> Unit,
-                 detailViewModel: DetailViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun DetailScreen(
+    detailViewModel: DetailViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     when(detailViewModel.detailUiState) {
         is DetailUiState.Success -> SuccessLoadScreen(routeEtaListData = (detailViewModel.detailUiState as DetailUiState.Success).etaList)
         is DetailUiState.Loading -> LoadingScreen()
-        else -> {}
+        is DetailUiState.Error -> ErrorScreen(retryAction = detailViewModel::getRouteEta)
     }
 }
 @Composable
-fun SuccessLoadScreen(routeEtaListData: List<Eta>) {
+fun SuccessLoadScreen(routeEtaListData: List<readyToDisplay2>) {
     LazyColumn() {
-        items(routeEtaListData.filter {
-            it.etaSequence == 1
-        }){
-            etaItem(route = it.route, another = it.etaSequence.toString())
+        items(routeEtaListData){
+            etaItem(route = it.stopName, another = it.eta)
         }
     }
 }
 
 @Composable
-fun etaItem(route: String, another: String, modifier: Modifier = Modifier) {
+fun etaItem(route: String, another: List<String>, modifier: Modifier = Modifier) {
     Box(modifier = modifier) {
         Row(modifier = Modifier.fillMaxSize()) {
             Text(text = route,
@@ -68,9 +67,16 @@ fun etaItem(route: String, another: String, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.headlineLarge)
 
             Text(text = "往", style = MaterialTheme.typography.titleLarge)
-            Text(text = another,
-                modifier = Modifier.padding(bottom = 5.dp),
-                style = MaterialTheme.typography.headlineLarge)
+            Column(Modifier.wrapContentHeight()){
+                for(i in 0 until another.size){
+                    //Log.d("DetailScreen",another[i])
+                    Text(text = another[i].substring(11,19),
+                        modifier = Modifier.padding(bottom = 5.dp),
+                        style = MaterialTheme.typography.headlineLarge)
+                }
+            }
+
+
         }
     }
     Divider()
@@ -88,7 +94,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 @Composable
 fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -100,4 +106,15 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
             Text(text = "retry")
         }
     }
+}
+
+fun getTimeDiff(eta: String) : String {
+    val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+    val date: Date = format.parse(eta)
+    val diff = date.getTime() - Date().getTime()
+    val min_diff = diff/1000/60
+    if(min_diff <= 0.01){
+        return "-"
+    }
+    else return min_diff.toString()
 }

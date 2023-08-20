@@ -1,5 +1,6 @@
 package com.example.bussecond.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,20 +31,21 @@ import com.example.bussecond.model.RouteDataList
 import com.example.bussecond.ui.AppViewModelProvider
 import com.example.bussecond.ui.navigation.NavigationDestination
 
-object HomeDestination : NavigationDestination {
+object HomeScreenDestination : NavigationDestination {
     override val route = "home"
-    override val titleRes = R.string.app_name
+    val titleRes = R.string.welcome
 }
 @Composable
-fun EtaHomeScreen(onRouteItemClick: (String, String) -> Unit,
+fun EtaHomeScreen(onRouteItemClick: (String, String, String) -> Unit,
                   homeViewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    Log.d("EtaHomeScreen","EtaHomeScreen")
     etaItemList(homeUiState = homeViewModel.homeUiState, retryAction = homeViewModel::getRouteListDataForTheHomeScreen,
         onRouteItemClick = onRouteItemClick
     )
 }
 @Composable
-fun etaItemList(homeUiState: HomeUiState, retryAction: () -> Unit, onRouteItemClick: (String, String) -> Unit) {
+fun etaItemList(homeUiState: HomeUiState, retryAction: () -> Unit, onRouteItemClick: (String, String, String) -> Unit) {
     when(homeUiState){
         is HomeUiState.Error -> ErrorScreen(retryAction = retryAction)
         is HomeUiState.Loading -> LoadingScreen()
@@ -51,15 +53,20 @@ fun etaItemList(homeUiState: HomeUiState, retryAction: () -> Unit, onRouteItemCl
     }
 }
 @Composable
-fun SuccessLoadScreen(routeDataList: RouteDataList, onRouteItemClick: (String, String) -> Unit) {
-    val resultList = routeDataList.data.map{
+fun SuccessLoadScreen(routeDataList: RouteDataList, onRouteItemClick: (String, String, String) -> Unit) {
+    val resultList = routeDataList.data.filter {
+        it.service_type == "1"
+    }.map{
         EtaHomePageItem(route = it.route, destination = it.dest_tc, bound = it.bound)
     }
     LazyColumn() {
         items(resultList){
-                etaItem(it, modifier = Modifier.padding(vertical = 5.dp).clickable {
-                    onRouteItemClick(it.route,it.bound)
-                })
+                etaItem(it, modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .clickable {
+                        Log.d("HomeScreen",it.route)
+                        onRouteItemClick(it.bound, it.route, it.destination)
+                    })
         }
     }
 }
@@ -96,7 +103,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 @Composable
 fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

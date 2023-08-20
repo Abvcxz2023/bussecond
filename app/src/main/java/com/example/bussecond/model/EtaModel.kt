@@ -11,6 +11,7 @@ data class RouteEta(
     val data: List<Eta> = emptyList(),
 )
 
+
 @Serializable
 data class Eta(
     val co: String = "KMB",//The bus company
