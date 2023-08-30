@@ -12,5 +12,5 @@ This is the Screen to show the ETA of a specific route. User can bookmark the st
 <br />
 <br />
 <hr>
-<img src="https://github.com/Abvcxz2023/bussecond/blob/master/DetailScreen.png" width = "30%" height= "30%">
+<img src="https://github.com/Abvcxz2023/bussecond/blob/master/BookmarkScreen.png" width = "30%" height= "30%">
 This is the Bookmark Screen where user can see the bookmarked ETA.
