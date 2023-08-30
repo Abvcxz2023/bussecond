@@ -106,9 +106,9 @@ fun DetailTopBar(route: String,
             }
         } },
         actions = {
-            IconButton(onClick = { onLikeClick() }) {
-                Icon(Icons.Filled.ThumbUp,"ThumbUP")
-            }
+//            IconButton(onClick = { onLikeClick() }) {
+//                Icon(Icons.Filled.ThumbUp,"ThumbUP")
+//            }
         }
     )
 }
