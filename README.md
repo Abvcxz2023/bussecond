@@ -6,4 +6,4 @@ It is built with jetpack compose. Specific Route at a specific station can be bo
 <br />
 This is the HomeScreen where all the routes are listed. User can click on a specific route and view the ETA.
 
-<img src="https://github.com/Abvcxz2023/bussecond/blob/master/HomeScreen.png" width = 50%>
+<img src="https://github.com/Abvcxz2023/bussecond/blob/master/HomeScreen.png" width = "50%" height= "50%">
