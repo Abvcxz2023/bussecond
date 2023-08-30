@@ -3,4 +3,5 @@ This app displays the estimated time of arrival of Buses in Hong Kong. It uses t
 It is built with jetpack compose. Specific Route at a specific station can be bookmark.
 
 ![HomeScreen](https://github.com/Abvcxz2023/bussecond/blob/master/DetailScreen.png)
+<br />
 This is the HomeScreen where all the routes are listed. User can click on a specific route and view the ETA.
