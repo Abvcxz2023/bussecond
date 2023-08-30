@@ -1,5 +1,6 @@
 package com.example.bussecond.data
 
+import android.content.Context
 import com.example.bussecond.network.EtaApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -9,8 +10,7 @@ import retrofit2.Retrofit
 interface AppContainer {
     val etaRepository: EtaRepository
 }
-
-class DefaultAppContainer(): AppContainer{
+class DefaultAppContainer(context: Context): AppContainer{
     private val baseUrl = "https://data.etabus.gov.hk"
 
     private val retrofit = Retrofit.Builder()
@@ -22,5 +22,7 @@ class DefaultAppContainer(): AppContainer{
         retrofit.create(EtaApiService::class.java)
     }
 
-    override val etaRepository: EtaRepository = EtaRepository(retrofitService)
+    override val etaRepository: EtaRepository by lazy {
+        EtaRepository(retrofitService,BookmarkDatabase.getDatabase(context).bookmarkDao())
+    }
 }

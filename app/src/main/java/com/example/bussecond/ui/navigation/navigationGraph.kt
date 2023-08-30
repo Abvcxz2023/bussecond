@@ -29,6 +29,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.bussecond.ui.AppViewModelProvider
+import com.example.bussecond.ui.bookmark.BookmarkScreen
+import com.example.bussecond.ui.bookmark.BookmarkScreenDestination
+import com.example.bussecond.ui.bookmark.MainBookmarkScreen
 import com.example.bussecond.ui.detailScreen.DetailScreen
 import com.example.bussecond.ui.detailScreen.DetailScreenDestination
 import com.example.bussecond.ui.home.EtaHomeScreen
@@ -82,30 +85,19 @@ fun MyEtaAppBar(
 fun MyEtaApp(
     navController: NavHostController = rememberNavController()
 ) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    Scaffold(
-        topBar = {
-            MyEtaAppBar(
-                backStackEntry = backStackEntry,
-                canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() },
-            )
-        }
-    ) { innerPadding ->
-
-        NavHost(
+    NavHost(
             navController = navController,
             startDestination = HomeScreenDestination.route,
-            modifier = Modifier.padding(innerPadding)
         ){
             composable(route = HomeScreenDestination.route){
                 EtaHomeScreen(
                     onRouteItemClick = {
                         bound: String, route: String, destination: String ->
                         navController.navigate("${DetailScreenDestination.route}/${bound}/${route}/${destination}")
-                        Log.d("navigationGraph",route)
                     },
-                    homeViewModel  = viewModel(factory = AppViewModelProvider.Factory)
+                    onBookmarkScreenClick = {
+                        navController.navigate(route = BookmarkScreenDestination.route)
+                    }
                 )
             }
             composable(route = DetailScreenDestination.routeWithArgs,
@@ -114,9 +106,15 @@ fun MyEtaApp(
                         navArgument(DetailScreenDestination.destination) {type = NavType.StringType}
                     )
             ){
-                Log.d("navigationGraph",backStackEntry?.arguments?.getString("destination")?: "Damn")
-                DetailScreen()
+                val canNavigateBack = navController.previousBackStackEntry != null
+                DetailScreen(canNavigateBack,
+                    {navController.navigateUp()})
             }
+            composable(route = BookmarkScreenDestination.route){
+                MainBookmarkScreen(
+                    onNavigateBack = navController::navigateUp
+                )
+            }
+
         }
     }
-}

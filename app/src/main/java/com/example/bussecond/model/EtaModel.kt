@@ -51,7 +51,8 @@ data class RouteStation(
 data class StopInformationList(
     val type: String,
     val version: String,
-    val generated_timestamp: String,
+    @SerialName("generated_timestamp")
+    val generatedTimestamp: String,
     val data: List<StopInformation>,
 )
 
